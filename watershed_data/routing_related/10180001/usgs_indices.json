@@ -1,0 +1,10 @@
+{
+    "USGS_06620000": {
+        "grid_index": [2, 7],
+        "drainage_area_km2": 3689.37
+    },
+    "USGS_06614800": {
+        "grid_index": [13, 16],
+        "drainage_area_km2": 4.1
+    }
+}
