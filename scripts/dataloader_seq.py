@@ -13,7 +13,7 @@ import pdb
 MISSING_VALUE = -9999  # Placeholder for missing values
 
 class PecanDataset(Dataset):
-    def __init__(self, data_dir, var_names, basin_data_root, basin_id, years, routing_matrix_path, usgs_index_path, seq_length, model_type="pecan", normalize=True, vector_routing_path=None):
+    def __init__(self, data_dir, var_names, basin_data_root, basin_id, years, routing_matrix_path, usgs_index_path, seq_length, model_type="pecan", normalize=True, vector_routing_path=None, norm_stats=None):
         """
         Load meteorological, streamflow, routing matrix, and USGS gauge indices.
         Converts data into sequential format for training.
@@ -33,7 +33,8 @@ class PecanDataset(Dataset):
         self.basin_data_root = Path(basin_data_root)
         self.basin_id = basin_id
         self.years = years
-        self.normalize = normalize  
+        self.normalize = normalize
+        self._norm_stats = norm_stats  # pre-computed (var_mean, var_std, q_mean, q_std) or None
 
         print(f"Initializing dataset for Basin ID: {self.basin_id} | Mode: {self.model_type}")
 
@@ -140,6 +141,8 @@ class PecanDataset(Dataset):
 
     def _load_or_compute_normalization_stats(self):
         """Load or compute global normalization statistics."""
+        if self._norm_stats is not None:
+            return self._norm_stats
         return compute_global_normalization_stats()
 
     def __len__(self):
@@ -172,7 +175,7 @@ class PecanDataset(Dataset):
             else:  # mclstm / mcrlstm
                 sample_seq[:, 1:] = (sample_seq[:, 1:] - mean[:, 1:]) / (std[:, 1:] + 1e-6)
             
-        return sample_seq, mask_seq, target_seq, timestamp_seq[-1].strftime("%Y-%m-%d")
+        return sample_seq, mask_seq, target_seq, timestamp_seq.iloc[-1].strftime("%Y-%m-%d")
 
 def load_data(model_type):
     """Splits data into train, validation, and test sets, ensuring alignment with the water year."""
@@ -247,7 +250,8 @@ def load_data_chronological(model_type):
         seq_length=cfg.SEQ_LENGTH,
         model_type=model_type,
         normalize=True,
-        norm_stats=norm_stats,    
+        norm_stats=norm_stats,
+        vector_routing_path=cfg.VECTOR_ROUTING_PATH,
     )
 
     val_dataset = PecanDataset(
@@ -258,7 +262,8 @@ def load_data_chronological(model_type):
         seq_length=cfg.SEQ_LENGTH,
         model_type=model_type,
         normalize=True,
-        norm_stats=norm_stats,  
+        norm_stats=norm_stats,
+        vector_routing_path=cfg.VECTOR_ROUTING_PATH,
     )
 
     test_dataset = PecanDataset(
@@ -269,7 +274,8 @@ def load_data_chronological(model_type):
         seq_length=cfg.SEQ_LENGTH,
         model_type=model_type,
         normalize=True,
-        norm_stats=norm_stats,       
+        norm_stats=norm_stats,
+        vector_routing_path=cfg.VECTOR_ROUTING_PATH,
     )
 
     # Ensure spatial dims are set

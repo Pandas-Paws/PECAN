@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
+import os
 import torch
 import pdb
 
 class NSELoss(torch.nn.Module):
 
     # Weighted Nash–Sutcliffe Efficiency (NSE) Loss with internal gauge weights.
+    # Weights can be overridden via PECAN_LOSS_W0 (G2 outlet) and PECAN_LOSS_W1 (G1 upstream).
 
     def __init__(self, eps: float = 1e-5):
         super(NSELoss, self).__init__()
         self.eps = eps
 
-        # Define your weights here (adjust values and size to match num_gauges)
-        self.weights = torch.tensor([0.8, 0.2])  # shape: (num_stations,)
+        w0 = float(os.environ.get("PECAN_LOSS_W0", 0.8))
+        w1 = float(os.environ.get("PECAN_LOSS_W1", 0.2))
+        self.weights = torch.tensor([w0, w1])  # shape: (num_stations,); index0=outlet(06620000), index1=upstream(06614800)
         # If you're training on GPU, move this to CUDA later in forward()
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor):

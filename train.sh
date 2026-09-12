@@ -29,7 +29,7 @@ echo "GPU: $CUDA_VISIBLE_DEVICES" >> "$LOG_FILE"
 echo "============================" >> "$LOG_FILE"
 
 # Run main.py in the background, redirect stdout and stderr to the log file
-nohup bash -lc "exec -a pecan_${RUNNAME} python -u main.py" >> "$LOG_FILE" 2>&1 &
+nohup bash -lc "source /data/home/yihan/ssm_hydrology/venv/bin/activate && exec -a pecan_${RUNNAME} python -u main.py" >> "$LOG_FILE" 2>&1 &
 
 # Get the process ID (PID)
 PID=$!

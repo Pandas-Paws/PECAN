@@ -13,11 +13,43 @@ import pickle
 import numpy as np
 from pprint import pprint
 
-test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing_mcr_do0.1_notc"
-saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing_mcr_do0.1_notc"
+test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.0011_rvic_nhdplusD800v4unconstrained_layernorm_ingate_dropout2d"
+saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.0011_rvic_nhdplusD800v4unconstrained_layernorm_ingate_dropout2d"
 
-test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_60_0.2do_epoch80_randval_cosannealing_mcr_lr0.001_retrain"
-saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch80_randval_cosannealing_mcr_lr0.001_retrain"
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.70.3_180_0.2do_epoch80_randval_cosannealing_mcr_lr0.001_retrain"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.70.3_180_0.2do_epoch80_randval_cosannealing_mcr_lr0.001_retrain"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcrdo0.2_lr0.001_rvic_ep150pat25_torch19"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcrdo0.2_lr0.001_rvic_ep150pat25_torch19"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.001_rvic_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.001_rvic_sweep"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.002_rvic_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.002_rvic_sweep"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.001_muskingumcunge_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.001_muskingumcunge_sweep"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.002_muskingumcunge_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch150_randval_cosannealing_mc_lr0.002_muskingumcunge_sweep"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.0005_muskingumcunge_mrgatefix_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.0005_muskingumcunge_mrgatefix_sweep"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.0015_muskingumcunge_mrgatefix_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.0015_muskingumcunge_mrgatefix_sweep"
+
+#test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.0005_rvic_mrgatefix_sweep"
+#saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.0005_rvic_mrgatefix_sweep"
+
+test_csv_name = "test_preds_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.00075_rvic_v1p0D800_groupnorm_ingate_dropout2d_weights0802"
+saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch150_randval_cosannealing_mcr_lr0.00075_rvic_v1p0D800_groupnorm_ingate_dropout2d_weights0802"
+
+import os
+if os.environ.get("PECAN_RUN_NAME"):
+    test_csv_name = f"test_preds_{os.environ['PECAN_RUN_NAME']}"
+    saving_pkl_name = f"pecan_best_model_{os.environ['PECAN_RUN_NAME']}"
 
 #test_csv_name = "test_preds_mcrouting_retention_cs_0.90.1_180_0.2do_epoch80_randval_cosannealing_vbrouting"
 #saving_pkl_name = "pecan_best_model_mcrouting_retention_cs_0.90.1_180_0.2do_epoch80_randval_cosannealing_vbrouting"
@@ -29,18 +61,21 @@ def train_model(model, train_loader, val_loader):
 
     #criterion = WeightedRMSELoss()
     criterion = NSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=cfg.LEARNING_RATE)
+    grad_clip_max_norm = float(os.environ.get("PECAN_GRAD_CLIP", 1.0))
+    print(f"[train_seq] grad_clip_max_norm = {grad_clip_max_norm} (PECAN_GRAD_CLIP env = "
+          f"{os.environ.get('PECAN_GRAD_CLIP', '<unset, using default 1.0>')})")
+    optimizer = optim.Adam(model.parameters(), lr=cfg.LEARNING_RATE, weight_decay=cfg.WEIGHT_DECAY)
     #scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
     
     scheduler = optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
         T_max=cfg.NUM_EPOCHS,   # full cosine cycle = total epochs
-        eta_min=1e-4            # final LR floor
+        eta_min=cfg.LR_MIN      # final LR floor (PECAN_LR_MIN, default 1e-4)
     )
     
 
     # Early stopping parameters
-    patience = 10
+    patience = 15
     best_val_loss = float('inf')
     epochs_no_improve = 0
     best_state = None
@@ -72,26 +107,29 @@ def train_model(model, train_loader, val_loader):
             loss.backward()
 
             # Gradient Clipping
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip_max_norm)
 
             optimizer.step()
             running_loss += loss.item()
 
-        # Compute validation loss
-        val_loss = 0.0
+        # Compute validation loss over the full val set at once (global NSE, not per-batch)
+        # Per-batch NSE explodes when batches are temporally ordered (near-zero batch variance).
+        all_val_pred, all_val_target = [], []
         model.eval()
         with torch.no_grad():
             for batch, mask, target, timestamps in val_loader:
                 batch, mask, target = batch.to(cfg.DEVICE), mask.to(cfg.DEVICE), target.to(cfg.DEVICE)
                 xm = batch[:, :, 0:1, :, :]
                 xa = batch[:, :, 1:, :, :]
-
                 q_pred, *_ = model(xm, xa, mask)
-                val_loss += criterion(q_pred, target).item()
+                all_val_pred.append(q_pred.cpu())
+                all_val_target.append(target.cpu())
+        all_val_pred   = torch.cat(all_val_pred,   dim=0)
+        all_val_target = torch.cat(all_val_target, dim=0)
+        val_loss = criterion(all_val_pred, all_val_target).item()
 
-        # Average losses
+        # Average train loss
         train_loss = running_loss / len(train_loader)
-        val_loss /= len(val_loader)
 
         scheduler.step() # val_loss if scheduler is ReduceLROnPlateau
         
@@ -196,11 +234,11 @@ def test_model(model, test_loader):
             test_loss += criterion(q_pred, target).item()
 
             # Save trash cell and cell state matrices using date-based names
-            model.save_trash_cell(trash_cell, timestamps, saving_path="trash_cell_outputs")
-            model.save_cell_state(cell_state, timestamps, saving_path="cell_state_outputs")
-            model.save_cell_state(retention, timestamps, saving_path="retention_state_outputs")
-            model.save_mr_flux(mr_flux, timestamps, "mr_flux_outputs", sum_channels=True)
-            model.save_mr_gate(mr_gate,  timestamps, "mr_gate_outputs", sum_channels=True)
+            model.save_trash_cell(trash_cell, timestamps, saving_path="trash_cell_outputs_manuscript")
+            model.save_cell_state(cell_state, timestamps, saving_path="cell_state_outputs_manuscript")
+            model.save_cell_state(retention, timestamps, saving_path="retention_state_outputs_manuscript")
+            model.save_mr_flux(mr_flux, timestamps, "mr_flux_outputs_manuscript", sum_channels=True)
+            model.save_mr_gate(mr_gate,  timestamps, "mr_gate_outputs_manuscript", sum_channels=True)
 
             # Save predictions and observations with timestamps
             for b in range(target.shape[0]):

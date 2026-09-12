@@ -18,8 +18,11 @@ from scripts.dataloader_seq import load_data
 from scripts.config import cfg
 import pdb
 
+print(f"[DIAG] cfg.SEQ_LENGTH={cfg.SEQ_LENGTH} cfg.PECAN_MODE={cfg.PECAN_MODE} cfg.MODEL_NAME={cfg.MODEL_NAME}")
+
 # **Load dataset**
 train_loader, val_loader, test_loader, routing_matrix, usgs_indices = load_data(cfg.MODEL_NAME.lower())
+print(f"[DIAG] len(test_loader.dataset)={len(test_loader.dataset)} test_loader.dataset.seq_length={test_loader.dataset.seq_length}")
 routing_matrix = routing_matrix.to(cfg.DEVICE)
 usgs_indices = {
     key: torch.tensor(value["grid_index"], dtype=torch.long, device=cfg.DEVICE) 
@@ -39,9 +42,8 @@ if cfg.MODEL_NAME.lower() == "pecan":
         usgs_indices=usgs_indices,
         mode =  cfg.PECAN_MODE
     ).to(cfg.DEVICE)
-    checkpoint_path = "checkpoints/pecan_best_model_mcrouting_retention_cs_0.80.2_60_0.2do_epoch80_randval_cosannealing_mc_lr0.0015_retrain.pkl"
+    checkpoint_path = "checkpoints/pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing_mcrdo0.2_retrain.pkl"
 
-    # pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing.pkl
     # pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing.pkl
     # "checkpoints/pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing_mcr_do0.2.pkl"
     # pecan_best_model_mcrouting_retention_cs_0.80.2_180_0.2do_epoch80_randval_cosannealing_mc_vbrouting.pkl

@@ -8,13 +8,17 @@ import pdb
 #==============================================
 #from pecan_model_routing import pecan
 #from scripts.models.pecan_model_routing_vector_fastslow import pecan
-from scripts.models.pecan_model_routing_fastslow import pecan
+#from scripts.models.pecan_model_routing_fastslow import pecan
+#from scripts.models.pecan_model_routing_fastslow_muskingum import pecan
+#from scripts.models.pecan_model_routing_fastslow_muskingum_softmax import pecan
+#from scripts.models.pecan_model_routing_fastslow_rvic import pecan
+from scripts.models.pecan_model_routing_fastslow_rvic import pecan
 from scripts.models.mclstm import MassConservingLSTM
 from scripts.models.mcrlstm import MassConservingLSTM_MR
 from scripts.models.lstm import StandardLSTM
 from scripts.train_seq import train_model, test_model
 from scripts.train_lumped_seq import train_lumped_mcmodel, test_lumped_mcmodel, train_lumped_mcrmodel, test_lumped_mcrmodel, train_lumped_lstm, test_lumped_lstm
-from scripts.dataloader_seq import load_data, load_debug_data
+from scripts.dataloader_seq import load_data, load_data_chronological, load_debug_data
 #==============================================
 
 def set_random_seed(seed=3407):# 3407
@@ -28,7 +32,7 @@ def set_random_seed(seed=3407):# 3407
     torch.backends.cudnn.benchmark = False
 
 # **Set the seed before everything else**
-set_random_seed()
+set_random_seed(int(os.environ.get("PECAN_SEED", 3407)))
 
 def main():
     """Main function to run data loading, training, and testing."""
@@ -106,7 +110,10 @@ def main():
     
     # This is old grid-based routing section.
     # Load train, validation, test data, and routing matrix
-    train_loader, val_loader, test_loader, routing_matrix, usgs_indices = load_data(cfg.MODEL_NAME.lower())
+    if cfg.CHRONO_SPLIT:
+        train_loader, val_loader, test_loader, routing_matrix, usgs_indices = load_data_chronological(cfg.MODEL_NAME.lower())
+    else:
+        train_loader, val_loader, test_loader, routing_matrix, usgs_indices = load_data(cfg.MODEL_NAME.lower())
     
     routing_matrix = routing_matrix.to(cfg.DEVICE)
 
@@ -125,9 +132,19 @@ def main():
             y_dim=cfg.Y_DIM,
             routing_matrix=routing_matrix.to(cfg.DEVICE),
             usgs_indices=usgs_indices,
-            mode =  cfg.PECAN_MODE
+            mode =  cfg.PECAN_MODE,
+            mc_spatial_retention = cfg.MC_SPATIAL_RETENTION,
+            mc_dual_retention = cfg.MC_DUAL_RETENTION,
+            mc_groupnorm_ingate = cfg.MC_GROUPNORM_INGATE,
+            mc_groupnorm_groups = cfg.MC_GROUPNORM_GROUPS,
+            mc_layernorm_ingate = cfg.MC_LAYERNORM_INGATE,
+            mc_groupnorm_outgate = cfg.MC_GROUPNORM_OUTGATE,
+            mc_dropout2d_ingate = cfg.MC_DROPOUT2D_INGATE,
+            mc_groupnorm_groups_outgate = cfg.MC_GROUPNORM_GROUPS_OUTGATE,
+            mc_dropout2d_outgate = cfg.MC_DROPOUT2D_OUTGATE,
+            rvic_kernel_path = cfg.RVIC_KERNEL_PATH
         ).to(cfg.DEVICE)
-        
+
     elif cfg.MODEL_NAME.lower() == "mclstm":
         model = MassConservingLSTM(
             in_dim=cfg.IN_CHANNELS,
